@@ -1,0 +1,41 @@
+afterRead(event) {
+        var that = this;
+        const {
+            file
+        } = event.detail;
+        // 当设置 mutiple 为 true 时, file 为数组格式，否则为对象格式
+        wx.uploadFile({
+            url: app.globalData.ApiServiceHost + "/File/FilesPosts",
+            filePath: file.path,
+            name: 'file',
+            success(res) {
+                // 上传完成需要更新 fileList
+                var url = JSON.parse(res.data);
+                that.data.fileList.push({
+                    ...file,
+                    url: app.globalData.ApiServiceHost + url.result,
+                });
+                that.setData({
+                    fileList: that.data.fileList
+                });
+            },
+        });
+    },
+    beforeRead(event) {
+        const {
+            file,
+            callback
+        } = event.detail;
+        callback(file.type === 'image');
+    },
+    //删除图片
+    deleteImg(event) {
+        var index = event.detail.index;
+        this.data.fileList.splice(index, 1);
+        this.setData({
+            fileList: this.data.fileList
+        })
+    },
+    overSizeWarn(event) {
+        console.log(event)
+    },
